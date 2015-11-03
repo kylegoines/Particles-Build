@@ -1,5 +1,5 @@
 var imageArray = [];
-var cloudsCount = 6;
+var cloudsCount = 29;
 var imageLoadSet  = 0;
 var cloudsWidth = 200;
 var canvas;
@@ -18,8 +18,8 @@ window.onload = function() {
 	canvasHeight = $( document ).height();
 	canvasWidth = $( document ).width()
 
-	$('canvas').attr( 'height', $(document).height() );
-	$('canvas').attr( 'width', $(document).width() );
+	$('canvas').attr( 'height', $( document ).height() );
+	$('canvas').attr( 'width', $( document ).width() );
 
 	context = canvas.getContext('2d');
 
@@ -36,11 +36,33 @@ window.onload = function() {
 		createCloud( 3, cloud0 ); imageLoadSet++;
 		createCloud( 4, cloud0 ); imageLoadSet++;
 		createCloud( 5, cloud0 ); imageLoadSet++;
+		createCloud( 6, cloud0 ); imageLoadSet++;
+		createCloud( 7, cloud0 ); imageLoadSet++;
+		createCloud( 8, cloud0 ); imageLoadSet++;
 	}
 
 	cloud1.onload = function() {
-		createCloud( 6, cloud1 ); imageLoadSet++;
-		createCloud( 7, cloud1 ); imageLoadSet++;
+		createCloud( 9, cloud1 ); imageLoadSet++;
+		createCloud( 10, cloud1 ); imageLoadSet++;
+		createCloud( 11, cloud1 ); imageLoadSet++;
+		createCloud( 12, cloud1 ); imageLoadSet++;
+		createCloud( 13, cloud1 ); imageLoadSet++;
+		createCloud( 14, cloud1 ); imageLoadSet++;
+		createCloud( 15, cloud1 ); imageLoadSet++;
+		createCloud( 16, cloud1 ); imageLoadSet++;
+		createCloud( 17, cloud1 ); imageLoadSet++;
+		createCloud( 18, cloud1 ); imageLoadSet++;
+		createCloud( 19, cloud1 ); imageLoadSet++;
+		createCloud( 20, cloud1 ); imageLoadSet++;
+		createCloud( 21, cloud1 ); imageLoadSet++;
+		createCloud( 22, cloud1 ); imageLoadSet++;
+		createCloud( 23, cloud1 ); imageLoadSet++;
+		createCloud( 24, cloud1 ); imageLoadSet++;
+		createCloud( 25, cloud1 ); imageLoadSet++;
+		createCloud( 26, cloud1 ); imageLoadSet++;
+		createCloud( 27, cloud1 ); imageLoadSet++;
+		createCloud( 28, cloud1 ); imageLoadSet++;
+
 	}
 
 	initAnimation();
@@ -50,7 +72,6 @@ window.onload = function() {
 /////////////////////////////////////////////////////////////////////
 
 //getting mouse movement
-
 function hoverAction( elem ) {
 	$('canvas').trigger('mousemove');
 }
@@ -77,7 +98,6 @@ function updateRepulse( x, y ){
 		return;
 	}
 
-
 	repulse.xPos = x;
 	repulse.yPos = y;
 
@@ -87,7 +107,7 @@ function drawRepulse(){
 
 	context.beginPath();
 	context.arc(repulse.xPos, repulse.yPos, 20, 0, 2 * Math.PI, false);
-	context.stroke();
+	//context.stroke();
 
 }
 
@@ -105,14 +125,44 @@ function negOrPos( number ) {
 
 }
 
+function clamp( number, min, max ) {
+	console.log(Math.min( Math.max( number, min ), max))
+	return Math.min( Math.max( number, min ), max);
+};
+
+
 /////////////////////////////////////////////////////////////////////
 
-function collideTest() {
+function collide() {
 
 	for ( var c=0; c < ( imageArray.length ); c++) {
 
-		if ( (imageArray[c].xPos > repulse.xPos - 50 && imageArray[c].xPos < repulse.xPos + 50) && (imageArray[c].yPos > repulse.yPos - 50 && imageArray[c].yPos < repulse.yPos + 50 ) ) {
-			console.log('bounds');
+		if ( (imageArray[c].xPos > repulse.xPos - 125 && imageArray[c].xPos < repulse.xPos + 125 ) && (imageArray[c].yPos > repulse.yPos - 125 && imageArray[c].yPos < repulse.yPos + 125 ) ) {
+			
+			var dx_mouse = imageArray[c].xPos - repulse.xPos,
+				dy_mouse = imageArray[c].yPos - repulse.yPos,
+				dist_mouse = Math.sqrt( dx_mouse * dx_mouse + dy_mouse * dy_mouse );
+
+			var normVec = { x: dx_mouse / dist_mouse, 
+							y: dy_mouse / dist_mouse 
+							},
+				repulseRadius = 125,
+				velocity = 100,
+				repulseFactor = clamp( ( 1 / repulseRadius ) * ( -1 * Math.pow( dist_mouse / repulseRadius, 2 ) + 1 ) * repulseRadius*velocity, 0, 50 );
+			
+			var pos = {
+				x: imageArray[c].xPos + normVec.x * repulseFactor,
+				y: imageArray[c].yPos + normVec.y * repulseFactor
+			}
+
+			if ( pos.x - 60 > 0 && pos.x + 60 < canvasWidth ) {
+				imageArray[c].xPos = pos.x;	
+			}
+
+			if ( pos.y - 60 > 0 && pos.y + 60 < canvasHeight ) {
+				imageArray[c].yPos = pos.y;	
+			}
+
 		}
 
 	}
@@ -155,7 +205,7 @@ function initAnimation() {
 
 		render();
 		update();
-		collideTest();
+		collide();
 
 	  } )();
 }
@@ -164,7 +214,7 @@ function initAnimation() {
 
 function update() {
 
-	 hoverAction();
+	hoverAction();
 
 	for ( var c=0; c < ( imageArray.length ); c++ ) {
 
@@ -192,7 +242,6 @@ function render() {
  	drawRepulse();
 
 	//rendering mouse circle
-	
 
  	// rendering nanites
 	for ( var c=0; c < ( imageArray.length ); c++) {
