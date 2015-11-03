@@ -4,6 +4,13 @@ var imageLoadSet  = 0;
 var cloudsWidth = 200;
 var canvas;
 
+var repulse = {
+	radius: 10,
+	xPos: 0,
+	yPos: 0
+
+}
+
 window.onload = function() {
 
 	canvas  = document.getElementById( 'canvasClouds' ); 
@@ -38,29 +45,49 @@ window.onload = function() {
 
 	initAnimation();
 
-	hoverAction( canvas );
-
 }
 
 /////////////////////////////////////////////////////////////////////
 
+//getting mouse movement
+
 function hoverAction( elem ) {
-
-	elem.addEventListener('mousemove', function( evt ) {
-		
-		var mousePos = getMousePos( elem, evt );
-		console.log(mousePos);
-	} );
-
+	$('canvas').trigger('mousemove');
 }
+
+$('canvas').on('mousemove', function(evt){
+	getMousePos(canvas, evt)
+})
 
 function getMousePos(canvas, evt) {
 
 	var rect = canvas.getBoundingClientRect();
-	return {
-		x: evt.clientX - rect.left,
-		y: evt.clientY - rect.top
-	};
+	
+	var x = evt.clientX - rect.left;
+	var y = evt.clientY - rect.top;
+
+	updateRepulse( x, y );
+
+}
+
+function updateRepulse( x, y ){
+
+	// if these are not numbers do not update repulse with broken stuff;
+	if ( isNaN( x ) ||  isNaN( y ) ){
+		return;
+	}
+
+
+	repulse.xPos = x;
+	repulse.yPos = y;
+
+}
+
+function drawRepulse(){
+
+	context.beginPath();
+	context.arc(repulse.xPos, repulse.yPos, 20, 0, 2 * Math.PI, false);
+	context.stroke();
 
 }
 
@@ -74,6 +101,20 @@ function negOrPos( number ) {
 		return -(number)
 	} else {
 		return number
+	}
+
+}
+
+/////////////////////////////////////////////////////////////////////
+
+function collideTest() {
+
+	for ( var c=0; c < ( imageArray.length ); c++) {
+
+		if ( (imageArray[c].xPos > repulse.xPos - 50 && imageArray[c].xPos < repulse.xPos + 50) && (imageArray[c].yPos > repulse.yPos - 50 && imageArray[c].yPos < repulse.yPos + 50 ) ) {
+			console.log('bounds');
+		}
+
 	}
 
 }
@@ -114,6 +155,7 @@ function initAnimation() {
 
 		render();
 		update();
+		collideTest();
 
 	  } )();
 }
@@ -121,6 +163,8 @@ function initAnimation() {
 /////////////////////////////////////////////////////////////////////
 
 function update() {
+
+	 hoverAction();
 
 	for ( var c=0; c < ( imageArray.length ); c++ ) {
 
@@ -145,6 +189,12 @@ function render() {
 
 	context.clearRect( 0, 0, canvasWidth, canvasHeight );
  
+ 	drawRepulse();
+
+	//rendering mouse circle
+	
+
+ 	// rendering nanites
 	for ( var c=0; c < ( imageArray.length ); c++) {
 
 		if (  imageLoadSet >= cloudsCount ) {
